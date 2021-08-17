@@ -1,0 +1,116 @@
+{
+  "configVersion": 2,
+  "packages": [
+    {
+      "name": "archive",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/archive-3.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "cbor",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/cbor-4.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "charcode",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/charcode-1.3.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "collection",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/collection-1.15.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "convert",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/convert-3.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "crypto",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/crypto-3.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "dart_base45",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/dart_base45-1.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "equatable",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/equatable-2.0.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "http",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/http-0.12.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.4"
+    },
+    {
+      "name": "http_parser",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/http_parser-3.1.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.3"
+    },
+    {
+      "name": "meta",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/meta-1.7.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "path",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/path-1.8.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "pedantic",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/pedantic-1.11.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "source_span",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/source_span-1.8.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "string_scanner",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/string_scanner-1.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "term_glyph",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/term_glyph-1.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "typed_data",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/typed_data-1.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
+      "name": "flutter_ita_greenpass",
+      "rootUri": "../",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    }
+  ],
+  "generated": "2021-08-17T13:22:08.087403Z",
+  "generator": "pub",
+  "generatorVersion": "2.12.2"
+}

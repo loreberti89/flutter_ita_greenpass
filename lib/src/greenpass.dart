@@ -55,7 +55,7 @@ class Greenpass extends Equatable{
         return now.isAfter(this.expiration);
 
     }
-    Future<bool> isValidSignatureOnSite(api_url) async{
+    Future<bool> isValidSignatureOnSite(api_url, code) async{
         //For Now I have put a Call to my backend and then make a Validation From NodejS trascrition of dcc-utils
         //The translation from JS dcc-utils and DART for the validation was complicated for now and my deadline :)
         // but in future can be implemented

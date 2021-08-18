@@ -44,6 +44,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "dio",
+      "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/dio-3.0.10",
+      "packageUri": "lib/",
+      "languageVersion": "2.4"
+    },
+    {
       "name": "equatable",
       "rootUri": "file:///C:/Users/Lorenzo/AppData/Local/Pub/Cache/hosted/pub.dartlang.org/equatable-2.0.3",
       "packageUri": "lib/",
@@ -110,7 +116,7 @@
       "languageVersion": "2.12"
     }
   ],
-  "generated": "2021-08-17T13:22:08.087403Z",
+  "generated": "2021-08-18T13:28:34.918566Z",
   "generator": "pub",
   "generatorVersion": "2.12.2"
 }

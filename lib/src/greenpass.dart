@@ -7,6 +7,7 @@ import 'package:archive/archive_io.dart';
 import 'package:cbor/cbor.dart';
 import 'package:dart_base45/dart_base45.dart';
 import 'package:equatable/equatable.dart';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 
 class Greenpass extends Equatable{
@@ -54,17 +55,19 @@ class Greenpass extends Equatable{
         return now.isAfter(this.expiration);
 
     }
-    checkSignature(dynamic signatureKey)  async {
-        dynamic verifier = {
-            "key": signatureKey,
-        };
-        // return cose.sign.verify(this.inflated, verifier);
-    }
+    Future<bool> isValidSignatureOnSite(api_url) async{
+        //For Now I have put a Call to my backend and then make a Validation From NodejS trascrition of dcc-utils
+        //The translation from JS dcc-utils and DART for the validation was complicated for now and my deadline :)
+        // but in future can be implemented
+        try {
+            var response = await Dio().post(api_url+"/checkGreenPass", data: {"code": code});
+            return response.data["valid"];
+        }catch(e){
+            print(e);
+            return false;
+        }
 
-
-    Future<bool> isValidSignature() async{
-        return false;
-        http.Response response = await http.get(this.TRUST_LIST_URL);
+        /*http.Response response = await http.get(this.TRUST_LIST_URL);
         var signatures = jsonDecode(response.body);
         for (Map<dynamic, dynamic> signature  in signatures) {
             if (signature.containsKey("pub")) {
@@ -83,7 +86,7 @@ class Greenpass extends Equatable{
 
                 }
             }
-        }
+        }*/
 
 
 

@@ -19,3 +19,5 @@ dev_dependencies:
    archive: ^3.1.2
    equatable: ^2.0.0
    cbor: ^4.0.2
+   dio: 3.0.10
+

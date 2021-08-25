@@ -16,9 +16,30 @@ class Greenpass extends Equatable{
     late List<int> inflated;
     late Map payload;
     late String name;
+
     late String surname;
     late String version;
     late String dob;
+
+
+    late String vaccineType;
+    late int doseNumber;
+    late int totalSeriesOfDoses;
+    late String dateOfVaccination;
+
+
+    final APP_MIN_VERSION = "android";
+    final RECOVERY_CERT_START_DAY = "recovery_cert_start_day";
+    final RECOVERY_CERT_END_DAY = "recovery_cert_end_day";
+    final MOLECULAR_TEST_START_HOUR = "molecular_test_start_hours";
+    final MOLECULAR_TEST_END_HOUR = "molecular_test_end_hours";
+    final RAPID_TEST_START_HOUR = "rapid_test_start_hours";
+    final RAPID_TEST_END_HOUR = "rapid_test_end_hours";
+    final VACCINE_START_DAY_NOT_COMPLETE = "vaccine_start_day_not_complete";
+    final VACCINE_END_DAY_NOT_COMPLETE = "vaccine_end_day_not_complete";
+    final VACCINE_START_DAY_COMPLETE = "vaccine_start_day_complete";
+    final VACCINE_END_DAY_COMPLETE = "vaccine_end_day_complete";
+
     String prefix = "HC1:";
     late String ci;
     late DateTime expiration;
@@ -42,6 +63,10 @@ class Greenpass extends Equatable{
         this.expiration = DateTime.fromMillisecondsSinceEpoch(decodedData[4] * 1000); //is timestamp
 
         Map payload = Map<String, dynamic>.from(decodedData[-260][1]);
+        this.vaccineType = payload["v"].first["mp"];
+        this.doseNumber = payload["v"].first["dn"];
+        this.dateOfVaccination = payload["v"].first["dt"];
+        this.totalSeriesOfDoses = payload["v"].first["sd"];
         this.ci = payload["v"].first["ci"];
         this.version = payload["ver"];
         this.dob = payload["dob"];
@@ -50,11 +75,106 @@ class Greenpass extends Equatable{
 
     }
 
+    getVaccineEndDayComplete(rules, vaccineType){
+        var rule = null;
+        for(int i = 0; i < rules.length; i++){
+            if(rules[i]["name"] == VACCINE_END_DAY_COMPLETE && rules[i]["type"] == vaccineType){
+                rule = rules[i];
+            }
+        }
+        return rule;
+    }
+
+    getVaccineStartDayNotComplete(rules, vaccineType){
+        var rule = null;
+        for(int i = 0; i < rules.length; i++){
+            if(rules[i]["name"] == VACCINE_START_DAY_NOT_COMPLETE && rules[i]["type"] == vaccineType){
+                rule = rules[i];
+            }
+        }
+        return rule;
+    }
+    getVaccineEndDayNotComplete(rules, vaccineType){
+        var rule = null;
+        for(int i = 0; i < rules.length; i++){
+            if(rules[i]["name"] == VACCINE_END_DAY_NOT_COMPLETE && rules[i]["type"] == vaccineType){
+                rule = rules[i];
+            }
+        }
+        return rule;
+    }
+
+    getVaccineStartDayComplete(rules, vaccineType){
+        var rule = null;
+        for(int i = 0; i < rules.length; i++){
+            if(rules[i]["name"] == VACCINE_START_DAY_COMPLETE && rules[i]["type"] == vaccineType){
+                rule = rules[i];
+            }
+        }
+        return rule;
+    }
+
     bool isPassExpired(){
         var now = DateTime.now();
         return now.isAfter(this.expiration);
 
     }
+    //this function is translated in DART from VERIFICA C-19 and get only rules ita.
+    Future<dynamic> isValidRule() async{
+        String urlRules = "https://get.dgc.gov.it/v1/dgc/settings";
+        var now = DateTime.now();
+        try{
+            var response = await Dio().get(urlRules);
+            String message = "";
+            bool result = false;
+            var rules = response.data;
+            var rule = getVaccineEndDayComplete(rules, vaccineType);
+
+
+            if(rule != null){
+                try{
+                    if(doseNumber < totalSeriesOfDoses){
+                        var daysStart = getVaccineStartDayNotComplete(rules, vaccineType)["value"];
+                        var daysEnd = getVaccineEndDayNotComplete(rules, vaccineType)["value"];
+                        DateTime startDate = DateTime.parse(dateOfVaccination).add(Duration(days: int.parse(daysStart)));
+                        DateTime endDate = DateTime.parse(dateOfVaccination).add(Duration(days: int.parse(daysEnd)));
+                        if(startDate.isAfter(now)){
+                            message = "not valid yet";
+                        }else{
+                            result = true;
+                            message = "partially valid";
+                        }
+                    }else
+                    if(doseNumber >= totalSeriesOfDoses){
+                        var daysStart = getVaccineStartDayComplete(rules, vaccineType)["value"];
+                        var daysEnd = getVaccineEndDayComplete(rules, vaccineType)["value"];
+                        DateTime startDate = DateTime.parse(dateOfVaccination).add(new Duration(days: int.parse(daysStart)));
+                        DateTime endDate = DateTime.parse(dateOfVaccination).add(new Duration(days: int.parse(daysEnd)));
+                        if(startDate.isAfter(now)){
+                            message = "not valid yet";
+                        }else{
+                            result = true;
+                            message = "valid";
+                        }
+                    }else{
+                        result = false;
+                        message = "not valid";
+                    }
+                }catch (e){
+                    result = false;
+                    message = "not valid";
+                }
+            }else{
+                result = false;
+                message = "not valid";
+            }
+            return {"result":result, "message":message};
+        }catch(e){
+            return {"result":false, "message":e};
+        }
+
+    }
+
     Future<bool> isValidSignatureOnSite(api_url, code) async{
         //For Now I have put a Call to my backend and then make a Validation From NodejS trascrition of dcc-utils
         //The translation from JS dcc-utils and DART for the validation was complicated for now and my deadline :)
@@ -99,7 +219,12 @@ class Greenpass extends Equatable{
         name,
         surname,
         dob,
-        ci
+        ci,
+        vaccineType,
+        doseNumber,
+        totalSeriesOfDoses,
+        dateOfVaccination,
+        dateOfVaccination
     ];
 
 

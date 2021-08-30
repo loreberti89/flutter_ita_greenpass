@@ -63,11 +63,22 @@ class Greenpass extends Equatable{
         this.expiration = DateTime.fromMillisecondsSinceEpoch(decodedData[4] * 1000); //is timestamp
 
         Map payload = Map<String, dynamic>.from(decodedData[-260][1]);
-        this.vaccineType = payload["v"].first["mp"];
-        this.doseNumber = payload["v"].first["dn"];
-        this.dateOfVaccination = payload["v"].first["dt"];
-        this.totalSeriesOfDoses = payload["v"].first["sd"];
-        this.ci = payload["v"].first["ci"];
+
+        if(payload.containsKey("r")){
+            this.ci = payload["r"].first["ci"];
+        }
+        if(payload.containsKey("v")){
+            this.vaccineType = payload["v"].first["mp"];
+            this.doseNumber = payload["v"].first["dn"];
+            this.dateOfVaccination = payload["v"].first["dt"];
+            this.totalSeriesOfDoses = payload["v"].first["sd"];
+            this.ci = payload["v"].first["ci"];
+        }
+        if(payload.containsKey("t")){
+            this.ci = payload["t"].first["ci"];
+        }
+
+
         this.version = payload["ver"];
         this.dob = payload["dob"];
         this.name = payload["nam"]["gn"];

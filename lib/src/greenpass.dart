@@ -26,6 +26,8 @@ class Greenpass extends Equatable{
     late int doseNumber;
     late int totalSeriesOfDoses;
     late String dateOfVaccination;
+    late String ci;
+    late DateTime expiration;
 
 
     final APP_MIN_VERSION = "android";
@@ -39,11 +41,19 @@ class Greenpass extends Equatable{
     final VACCINE_END_DAY_NOT_COMPLETE = "vaccine_end_day_not_complete";
     final VACCINE_START_DAY_COMPLETE = "vaccine_start_day_complete";
     final VACCINE_END_DAY_COMPLETE = "vaccine_end_day_complete";
+    final String prefix = "HC1:";
+    final String urlRules = "https://get.dgc.gov.it/v1/dgc/settings";
+    final String TRUST_LIST_URL = 'https://raw.githubusercontent.com/bcsongor/covid-pass-verifier/35336fd3c0ff969b5b4784d7763c64ead6305615/src/data/certificates.json'; //get from https://github.com/ministero-salute/dcc-utils/blob/master/examples/verify_signature_from_list.js
 
-    String prefix = "HC1:";
-    late String ci;
-    late DateTime expiration;
-    String TRUST_LIST_URL = 'https://raw.githubusercontent.com/bcsongor/covid-pass-verifier/35336fd3c0ff969b5b4784d7763c64ead6305615/src/data/certificates.json'; //get from https://github.com/ministero-salute/dcc-utils/blob/master/examples/verify_signature_from_list.js
+    final String NOT_DETECTED = "260415000";
+    final String NOT_VALID_YET= "Not valid yet";
+    final String VALID= "Valid";
+    final String NOT_VALID= "Not valid";
+    final String NOT_GREEN_PASS= "Not a green pass";
+    final String PARTIALLY_VALID = "Valid only in Italy";
+    //values get from https://github.com/eu-digital-green-certificates/dgca-app-core-android/blob/b9ba5b3bc7b8f1c510a79d07bbaecae8a6edfd74/decoder/src/main/java/dgca/verifier/app/decoder/model/Test.kt
+    final String DETECTED = "260373001";
+    Map rules;
 
     Greenpass();
 
@@ -62,7 +72,7 @@ class Greenpass extends Equatable{
 
         this.expiration = DateTime.fromMillisecondsSinceEpoch(decodedData[4] * 1000); //is timestamp
 
-        Map payload = Map<String, dynamic>.from(decodedData[-260][1]);
+        payload = Map<String, dynamic>.from(decodedData[-260][1]);
 
         if(payload.containsKey("r")){
             this.ci = payload["r"].first["ci"];
@@ -125,20 +135,139 @@ class Greenpass extends Equatable{
         return rule;
     }
 
+    getRapidTestStartHour(rules) {
+        var rule = null;
+        for(int i = 0; i < rules.length; i++){
+            if(rules[i]["name"] == RAPID_TEST_START_HOUR){
+                rule = rules[i];
+            }
+        }
+        return rule;
+
+
+    }
+    getRapidTestEndHour(rules) {
+        var rule = null;
+        for(int i = 0; i < rules.length; i++){
+            if(rules[i]["name"] == RAPID_TEST_END_HOUR){
+                rule = rules[i];
+            }
+        }
+        return rule;
+    }
+
     bool isPassExpired(){
         var now = DateTime.now();
         return now.isAfter(this.expiration);
 
     }
+
+    /* Function from VERIFICA-C19 */
+    checkTests(rules){
+        var obj = payload['t'].last();
+        String message = "";
+        var result = false;
+        var now = DateTime.now();
+        if (obj['tr'] == DETECTED) {
+            message = NOT_VALID;
+        }else{
+            try {
+                //in app Verifica C-19 get data and parse in UTC and then parse in Local
+                var odtDateTimeOfCollection = DateTime.utc(obj['sc']);
+                var ldtDateTimeOfCollection = odtDateTimeOfCollection.toLocal();
+
+                var daysStart = getRapidTestStartHour(rules)["value"];
+                var daysEnd = getRapidTestEndHour(rules)["value"];
+                DateTime startDate = ldtDateTimeOfCollection.add(Duration(hours: int.parse(daysStart)));
+                DateTime endDate = ldtDateTimeOfCollection.add(Duration(hours: int.parse(daysEnd)));
+
+                if(startDate.isAfter(now)){
+                    message = NOT_VALID_YET;
+                }else if(now.isAfter(endDate)){
+                    message = NOT_VALID;
+                }else{
+                    result = true;
+                    message = VALID;
+                }
+
+            } catch (e) {
+                result = false;
+                message = NOT_GREEN_PASS;
+
+            }
+        }
+
+        return {
+            result,
+            message
+        };
+
+    }
+
+
+    /* Function from VERIFICA-C19 */
+    checkRecoveryStatements(){
+        var obj = payload['r'].last();
+        DateTime now = DateTime.now();
+        String message = "";
+        bool result = false;
+        try {
+            var startDate = DateTime.parse(obj['df']);
+            var endDate  =DateTime.parse(obj['du']);
+            if(startDate.isAfter(now)){
+                message = NOT_VALID_YET;
+            }else if(now.isAfter(endDate)){
+                message = NOT_VALID;
+            }else{
+                result = true;
+                message = VALID;
+            };
+        } catch (e) {
+            result = false;
+            message = NOT_VALID;
+
+        }
+        return {
+            result,
+            message
+        };
+
+    }
+
+    Future fetchRules() async{
+        var response = await Dio().get(urlRules);
+        rules = response.data;
+    }
+
+    Future<dynamic> isValid() async {
+
+        try {
+
+            if(payload.containsKey("r")){
+               return checkRecoveryStatements();
+            }
+            if(payload.containsKey("v")){
+                return isValidRule(rules);
+            }
+            if(payload.containsKey("t")){
+                return checkTests(rules);
+            }
+
+
+        }catch(e){
+            return {"result":false, "message":e};
+        }
+
+    }
+
     //this function is translated in DART from VERIFICA C-19 and get only rules ita.
-    Future<dynamic> isValidRule() async{
-        String urlRules = "https://get.dgc.gov.it/v1/dgc/settings";
+    Future<dynamic> isValidRule(rules) async{
+
         var now = DateTime.now();
         try{
-            var response = await Dio().get(urlRules);
+
             String message = "";
             bool result = false;
-            var rules = response.data;
             var rule = getVaccineEndDayComplete(rules, vaccineType);
 
 

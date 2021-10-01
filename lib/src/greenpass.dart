@@ -202,6 +202,7 @@ class Greenpass extends Equatable{
                 //in app Verifica C-19 get data and parse in UTC and then parse in Local
                 var odtDateTimeOfCollection = DateTime.utc(obj['sc']);
                 var ldtDateTimeOfCollection = odtDateTimeOfCollection.toLocal();
+                var ldtEndDateTimeOfCollection = odtDateTimeOfCollection.toLocal();
                 DateTime startDate;
                 DateTime endDate;
 
@@ -210,14 +211,14 @@ class Greenpass extends Equatable{
                     var daysStart = getMolecularTestStartHour(rules)["value"];
                     var daysEnd = getMolecularTestEndHour(rules)["value"];
                     startDate = ldtDateTimeOfCollection.add(Duration(hours: int.parse(daysStart)));
-                    endDate = ldtDateTimeOfCollection.add(Duration(hours: int.parse(daysEnd)));
+                    endDate = ldtEndDateTimeOfCollection.add(Duration(hours: int.parse(daysEnd)));
 
 
                 }else{ //if not MOLECULAR IS RAPID FOR NOW
                     var daysStart = getRapidTestStartHour(rules)["value"];
                     var daysEnd = getRapidTestEndHour(rules)["value"];
                     startDate = ldtDateTimeOfCollection.add(Duration(hours: int.parse(daysStart)));
-                    endDate = ldtDateTimeOfCollection.add(Duration(hours: int.parse(daysEnd)));
+                    endDate = ldtEndDateTimeOfCollection.add(Duration(hours: int.parse(daysEnd)));
                 }
 
 

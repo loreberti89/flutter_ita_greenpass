@@ -53,6 +53,9 @@ class Greenpass extends Equatable{
     final String PARTIALLY_VALID = "Valid only in Italy";
     //values get from https://github.com/eu-digital-green-certificates/dgca-app-core-android/blob/b9ba5b3bc7b8f1c510a79d07bbaecae8a6edfd74/decoder/src/main/java/dgca/verifier/app/decoder/model/Test.kt
     final String DETECTED = "260373001";
+
+    final String TEST_RAPID = "LP217198-3";
+    final String TEST_MOLECULAR = "LP6464-4";
     Map rules;
 
     Greenpass();
@@ -146,6 +149,28 @@ class Greenpass extends Equatable{
 
 
     }
+
+    getMolecularTestStartHour(rules) {
+        var rule = null;
+        for(int i = 0; i < rules.length; i++){
+            if(rules[i]["name"] == MOLECULAR_TEST_START_HOUR){
+                rule = rules[i];
+            }
+        }
+        return rule;
+
+    }
+    getMolecularTestEndHour(rules){
+        var rule = null;
+        for(int i = 0; i < rules.length; i++){
+            if(rules[i]["name"] == MOLECULAR_TEST_END_HOUR){
+                rule = rules[i];
+            }
+        }
+        return rule;
+
+    }
+
     getRapidTestEndHour(rules) {
         var rule = null;
         for(int i = 0; i < rules.length; i++){
@@ -172,14 +197,31 @@ class Greenpass extends Equatable{
             message = NOT_VALID;
         }else{
             try {
+                var typeOfTest = obj['tt'];
+
                 //in app Verifica C-19 get data and parse in UTC and then parse in Local
                 var odtDateTimeOfCollection = DateTime.utc(obj['sc']);
                 var ldtDateTimeOfCollection = odtDateTimeOfCollection.toLocal();
+                DateTime startDate;
+                DateTime endDate;
 
-                var daysStart = getRapidTestStartHour(rules)["value"];
-                var daysEnd = getRapidTestEndHour(rules)["value"];
-                DateTime startDate = ldtDateTimeOfCollection.add(Duration(hours: int.parse(daysStart)));
-                DateTime endDate = ldtDateTimeOfCollection.add(Duration(hours: int.parse(daysEnd)));
+
+                if(typeOfTest == TEST_MOLECULAR){
+                    var daysStart = getMolecularTestStartHour(rules)["value"];
+                    var daysEnd = getMolecularTestEndHour(rules)["value"];
+                    startDate = ldtDateTimeOfCollection.add(Duration(hours: int.parse(daysStart)));
+                    endDate = ldtDateTimeOfCollection.add(Duration(hours: int.parse(daysEnd)));
+
+
+                }else{ //if not MOLECULAR IS RAPID FOR NOW
+                    var daysStart = getRapidTestStartHour(rules)["value"];
+                    var daysEnd = getRapidTestEndHour(rules)["value"];
+                    startDate = ldtDateTimeOfCollection.add(Duration(hours: int.parse(daysStart)));
+                    endDate = ldtDateTimeOfCollection.add(Duration(hours: int.parse(daysEnd)));
+                }
+
+
+
 
                 if(startDate.isAfter(now)){
                     message = NOT_VALID_YET;

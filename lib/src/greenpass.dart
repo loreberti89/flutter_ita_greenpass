@@ -16,6 +16,7 @@ class Greenpass extends Equatable{
     late List<int> inflated;
     late Map payload;
     late String name;
+    late bool isSuperGreenPass;
 
     late String surname;
     late String version;
@@ -79,6 +80,7 @@ class Greenpass extends Equatable{
 
         if(payload.containsKey("r")){
             this.ci = payload["r"].first["ci"];
+            this.isSuperGreenPass = true; //viene definito SuperGreenpass il pass che certifica Guarigione (r) o Vaccinazione (v)
         }
         if(payload.containsKey("v")){
             this.vaccineType = payload["v"].first["mp"];
@@ -86,9 +88,11 @@ class Greenpass extends Equatable{
             this.dateOfVaccination = payload["v"].first["dt"];
             this.totalSeriesOfDoses = payload["v"].first["sd"];
             this.ci = payload["v"].first["ci"];
+            this.isSuperGreenPass = true; //viene definito SuperGreenpass il pass che certifica Guarigione (r) o Vaccinazione (v)
         }
         if(payload.containsKey("t")){
             this.ci = payload["t"].first["ci"];
+            this.isSuperGreenPass = false; //viene definito SuperGreenpass il pass che certifica Guarigione (r) o Vaccinazione (v)
         }
 
 
@@ -396,6 +400,11 @@ class Greenpass extends Equatable{
 
 
     }
+
+    bool isASuperGreenPass(){
+        return this.isSuperGreenPass;
+    }
+
 
     @override
     List<Object> get props => [

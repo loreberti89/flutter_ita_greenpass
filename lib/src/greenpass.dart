@@ -57,7 +57,7 @@ class Greenpass extends Equatable{
 
     final String TEST_RAPID = "LP217198-3";
     final String TEST_MOLECULAR = "LP6464-4";
-    Map rules;
+    late Map rules;
 
     Greenpass();
 
